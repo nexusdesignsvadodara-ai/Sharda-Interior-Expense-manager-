@@ -1536,20 +1536,25 @@
       setSubmitting(true);
 
       try {
-        await fetch(APPS_SCRIPT_URL, {
+        const res = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          redirect: 'follow'
         });
 
-        // With no-cors, we can't read the response.
-        // Trust the submission and show success.
-        showToast('✅ Expense saved successfully!', 'success');
-        resetForm();
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          showToast('✅ Expense saved successfully!', 'success');
+          resetForm();
+        } else {
+          console.error('Server error:', result);
+          showToast(`❌ Error: ${result.message || 'Failed to save'}`, 'error');
+        }
       } catch (err) {
         console.error('Submit error:', err);
-        showToast('❌ Failed. Check connection.', 'error');
+        showToast('❌ Failed. Check connection & Apps Script deployment.', 'error');
       } finally {
         setSubmitting(false);
       }

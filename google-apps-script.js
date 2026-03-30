@@ -23,7 +23,10 @@
  */
 function doPost(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
+    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
+    if (!sheet) {
+      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expences");
+    }
     
     if (!sheet) {
       return ContentService
@@ -63,7 +66,10 @@ function doPost(e) {
  */
 function doGet(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
+    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
+    if (!sheet) {
+      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expences");
+    }
     
     if (!sheet) {
       return ContentService
