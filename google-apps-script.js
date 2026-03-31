@@ -23,14 +23,13 @@
  */
 function doPost(e) {
   try {
-    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
-    if (!sheet) {
-      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expences");
-    }
+    const sheetId = "1zJfYFOUtcm1lW5xo_eNrAky4SUaq2KdjVxjHqu9Wl9s";
+    const ss = SpreadsheetApp.openById(sheetId);
+    let sheet = ss.getSheetByName("Expenses") || ss.getSheetByName("Expences") || ss.getSheets()[0];
     
     if (!sheet) {
       return ContentService
-        .createTextOutput(JSON.stringify({ status: "error", message: "Sheet 'Expenses' not found" }))
+        .createTextOutput(JSON.stringify({ status: "error", message: "Sheet not found" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -66,10 +65,9 @@ function doPost(e) {
  */
 function doGet(e) {
   try {
-    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
-    if (!sheet) {
-      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expences");
-    }
+    const sheetId = "1zJfYFOUtcm1lW5xo_eNrAky4SUaq2KdjVxjHqu9Wl9s";
+    const ss = SpreadsheetApp.openById(sheetId);
+    let sheet = ss.getSheetByName("Expenses") || ss.getSheetByName("Expences") || ss.getSheets()[0];
     
     if (!sheet) {
       return ContentService
