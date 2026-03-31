@@ -39,6 +39,43 @@ function doPost(e) {
     const date = Utilities.formatDate(now, "Asia/Kolkata", "dd/MM/yyyy");
     const time = Utilities.formatDate(now, "Asia/Kolkata", "hh:mm a");
 
+    let photoCell = "No Receipt";
+    const photoData = data.receiptPhoto;
+
+    if (photoData && photoData !== "No" && photoData !== "No Receipt" && photoData.startsWith("data:image")) {
+      try {
+        // Extract base64 and mime type
+        const mimeType = photoData.substring(photoData.indexOf(":") + 1, photoData.indexOf(";"));
+        const base64String = photoData.split(",")[1];
+        const byteCharacters = Utilities.base64Decode(base64String);
+        
+        // Generate a valid filename based on itemName and timestamp
+        const ext = mimeType.split("/")[1] || "png";
+        const fileName = "Receipt_" + (data.itemName || "Expense").replace(/[^a-z0-9]/gi, '_') + "_" + now.getTime() + "." + ext;
+        
+        const blob = Utilities.newBlob(byteCharacters, mimeType, fileName);
+
+        // Find or create 'Sharda Interior Receipts' folder
+        const folderName = "Sharda Interior Receipts";
+        const folders = DriveApp.getFoldersByName(folderName);
+        let folder;
+        if (folders.hasNext()) {
+          folder = folders.next();
+        } else {
+          folder = DriveApp.createFolder(folderName);
+        }
+
+        // Save file & update permissions
+        const file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+        // Create hyperlink for the sheet cell
+        photoCell = '=HYPERLINK("' + file.getUrl() + '", "View Receipt")';
+      } catch (err) {
+        photoCell = "Error parsing receipt: " + err.message;
+      }
+    }
+
     sheet.appendRow([
       date,
       time,
@@ -46,7 +83,7 @@ function doPost(e) {
       data.amount,
       data.paymentType,
       data.receiptTaken,
-      data.receiptPhoto || "No Receipt"
+      photoCell
     ]);
 
     return ContentService
